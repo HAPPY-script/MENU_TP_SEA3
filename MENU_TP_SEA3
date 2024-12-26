@@ -47,7 +47,7 @@ local textData = {
     ";H_port (cảng)", ";H_castle (pháo đài)", ";H_tree (cây đại thụ)", 
     ";H_on_tree (trên cây đại thụ)", ";H_mansion (Dinh thự)", ";H_women (đảo phụ nữ)",
     ";H_dark_castle (lâu đài bóng tối)", ";H_tiki (đảo tiki)", ";H_ice_cream (đảo kem)",
-    ";H_cake (đảo bánh)"
+    ";H_cake (đảo bánh)", ";H_candy (đảo kẹo)"
 }
 
 for i, text in ipairs(textData) do
