@@ -1,103 +1,156 @@
-local gui = Instance.new("ScreenGui")
-local frame = Instance.new("Frame")
-local closeButton = Instance.new("TextButton")
-local scrollingFrame = Instance.new("ScrollingFrame")
-local uiStroke = Instance.new("UIStroke")
-local textLabels = {}
-local dragging = false
-local dragInput, dragStart, startPos
+local UIS = game:GetService("UserInputService")
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local starterGui = player:WaitForChild("PlayerGui")
+local backpack = player:WaitForChild("Backpack")
 
--- Thuộc tính GUI
-gui.Name = "CustomMenu"
-gui.Parent = game.CoreGui
+-- Tạo GUI chính
+local screenGui = Instance.new("ScreenGui", starterGui)
+screenGui.ResetOnSpawn = false
 
--- Thuộc tính Frame (Menu)
-frame.Name = "MenuFrame"
-frame.Parent = gui
-frame.BackgroundColor3 = Color3.fromRGB(9, 90, 90) -- Màu nền xanh aqua
-frame.Position = UDim2.new(0.4, 0, 0.3, 0)
-frame.Size = UDim2.new(0, 200, 0, 300) -- Kích thước ngắn hơn một chút
+-- Tông màu
+local backgroundColor = Color3.fromRGB(9, 50, 90) -- Aqua
+local buttonColor = Color3.fromRGB(170, 0, 255) -- Tím light
+local textColor = Color3.fromRGB(255, 255, 255) -- Trắng
 
--- Viền phát sáng màu tím
-uiStroke.Parent = frame
-uiStroke.Thickness = 2
-uiStroke.Color = Color3.fromRGB(170, 0, 255) -- Màu tím phát sáng hơn
-uiStroke.Transparency = 0.2 -- Độ trong suốt thấp để viền phát sáng hơn
-
--- Nút xóa
-closeButton.Name = "CloseButton"
-closeButton.Parent = frame
-closeButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0) -- Nút đỏ
-closeButton.Size = UDim2.new(0, 20, 0, 20)
-closeButton.Position = UDim2.new(0, 5, 0, 5)
-closeButton.Text = "X"
-closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-
--- ScrollingFrame để cuộn văn bản
-scrollingFrame.Name = "ScrollingFrame"
-scrollingFrame.Parent = frame
-scrollingFrame.Size = UDim2.new(1, -10, 1, -30)
-scrollingFrame.Position = UDim2.new(0, 5, 0, 30)
-scrollingFrame.BackgroundTransparency = 1
-scrollingFrame.CanvasSize = UDim2.new(0, 0, 3, 0) -- Kích thước để lăn lên xuống
-scrollingFrame.ScrollBarThickness = 6
-
--- Tạo các dòng text
-local textData = {
-    ";H_port (cảng)", ";H_castle (pháo đài)", ";H_tree (cây đại thụ)", 
-    ";H_on_tree (trên cây đại thụ)", ";H_mansion (Dinh thự)", ";H_women (đảo phụ nữ)",
-    ";H_dark_castle (lâu đài bóng tối)", ";H_tiki (đảo tiki)", ";H_ice_cream (đảo kem)",
-    ";H_cake (đảo bánh)", ";H_candy (đảo kẹo)", ";H_dojo (chùa rồng)"
+-- Dữ liệu nút
+local buttonsData = {
+    {Name = "Port", Script = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/HAPPY-script/TICKEN_PORT/refs/heads/main/TICKEN_PORT"))() end},
+    {Name = "Tree", Script = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/HAPPY-script/TICKEN_TREE/refs/heads/main/TICKEN_TREE"))() end},
+    {Name = "Cake", Script = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/HAPPY-script/TICKEN_CAKE/refs/heads/main/TICKEN_CAKE"))() end},
+    {Name = "Ice_cream", Script = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/HAPPY-script/TICKEN_ICE_CREAM/refs/heads/main/TICKEN_ICE_CREAM"))() end},
+    {Name = "Mansion", Script = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/HAPPY-script/TICKEN_MANSION/refs/heads/main/TICKEN_MANSION"))() end},
+    {Name = "Dark_castle", Script = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/HAPPY-script/TICKEN_DARK_CASTLE/refs/heads/main/TICKEN_DARK_CASTLE"))() end},
+    {Name = "Castle", Script = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/HAPPY-script/TICKEN_CASTLE/refs/heads/main/TICKEN_CASTLE"))() end},
+    {Name = "Women", Script = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/HAPPY-script/TICKEN_WOMEN/refs/heads/main/TICKEN_WOMEN"))() end},
+    {Name = "Tiki", Script = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/HAPPY-script/TICKEN_TIKI/refs/heads/main/TICKEN_TIKI"))() end},
+    {Name = "On_tree", Script = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/HAPPY-script/TICKEN_ON_TREE/refs/heads/main/TICKEN_ON_TREE"))() end},
+    {Name = "Candy", Script = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/HAPPY-script/TICKEN_CANDY/refs/heads/main/TICKEN_CANDY"))() end},
+    {Name = "Dojo", Script = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/HAPPY-script/TICKEN_DOJO/refs/heads/main/TICKEN_DOJO"))() end},
 }
 
-for i, text in ipairs(textData) do
-    local textLabel = Instance.new("TextLabel")
-    textLabel.Parent = scrollingFrame
-    textLabel.Text = string.format("%d. %s", i, text) -- Đánh số ở đầu dòng
-    textLabel.Size = UDim2.new(1, -10, 0, 20)
-    textLabel.Position = UDim2.new(0, 5, 0, (i - 1) * 25)
-    textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    textLabel.BackgroundTransparency = 1
-    textLabel.TextScaled = false
-    textLabel.TextSize = 17 -- Cỡ chữ nhỏ
-    textLabel.Font = Enum.Font.SourceSans
-    textLabel.TextXAlignment = Enum.TextXAlignment.Left -- Căn dòng chữ thẳng hàng
-    table.insert(textLabels, textLabel)
+-- Kích thước và vị trí mặc định
+local menuWidth, menuHeight = 400, 300
+local menuPosX, menuPosY = 100, 100
+
+-- Frame Menu chính
+local menuFrame = Instance.new("Frame", screenGui)
+menuFrame.Size = UDim2.new(0, menuWidth, 0, menuHeight)
+menuFrame.Position = UDim2.new(0, menuPosX, 0, menuPosY)
+menuFrame.BackgroundColor3 = backgroundColor
+menuFrame.Visible = false -- Ban đầu ẩn
+menuFrame.Active = true
+menuFrame.Draggable = true
+
+local uiCorner = Instance.new("UICorner", menuFrame)
+uiCorner.CornerRadius = UDim.new(0.1, 0)
+
+-- ScrollFrame cho nút
+local buttonContainer = Instance.new("ScrollingFrame", menuFrame)
+buttonContainer.Size = UDim2.new(1, -20, 1, -80)
+buttonContainer.Position = UDim2.new(0, 10, 0, 60)
+buttonContainer.BackgroundTransparency = 1
+buttonContainer.ScrollBarThickness = 5
+
+local layout = Instance.new("UIGridLayout", buttonContainer)
+layout.CellSize = UDim2.new(0, 120, 0, 40)
+layout.CellPadding = UDim2.new(0, 10, 0, 10)
+
+-- Thanh tìm kiếm
+local searchBox = Instance.new("TextBox", menuFrame)
+searchBox.Size = UDim2.new(0.8, 0, 0, 30)
+searchBox.Position = UDim2.new(0.1, 0, 0, 10)
+searchBox.PlaceholderText = "Search..."
+searchBox.Text = ""
+searchBox.TextColor3 = textColor
+searchBox.BackgroundColor3 = buttonColor
+searchBox.Font = Enum.Font.SourceSans
+searchBox.TextScaled = true
+
+local searchCorner = Instance.new("UICorner", searchBox)
+searchCorner.CornerRadius = UDim.new(0.1, 0)
+
+-- Thêm nút vào menu
+local function addButton(name, scriptFunc)
+    local button = Instance.new("TextButton", buttonContainer)
+    button.Size = UDim2.new(0, 120, 0, 40)
+    button.Text = name
+    button.BackgroundColor3 = buttonColor
+    button.TextColor3 = textColor
+    button.Font = Enum.Font.SourceSansBold
+    button.TextScaled = true
+
+    button.MouseButton1Click:Connect(function()
+        scriptFunc()
+    end)
 end
 
--- Kéo thả Menu
-local function update(input)
-	local delta = input.Position - dragStart
-	frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+-- Cập nhật nút theo tìm kiếm
+local function updateButtons()
+    for _, button in ipairs(buttonContainer:GetChildren()) do
+        if button:IsA("TextButton") then
+            button:Destroy()
+        end
+    end
+
+    local searchText = searchBox.Text:lower()
+    for _, buttonData in ipairs(buttonsData) do
+        if buttonData.Name:lower():find(searchText) then
+            addButton(buttonData.Name, buttonData.Script)
+        end
+    end
 end
 
-frame.InputBegan:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1 then
-		dragging = true
-		dragStart = input.Position
-		startPos = frame.Position
-		
-		input.Changed:Connect(function()
-			if input.UserInputState == Enum.UserInputState.End then
-				dragging = false
-			end
-		end)
-	end
+searchBox.Changed:Connect(updateButtons)
+
+-- Ban đầu tải các nút
+updateButtons()
+
+-- Tạo item Menu
+local menuItem = Instance.new("Tool")
+menuItem.Name = "Menu TP"
+menuItem.Parent = backpack
+
+-- Tạo mô hình item Menu
+local menuModel = Instance.new("Part")
+menuModel.Size = Vector3.new(1, 1, 1)
+menuModel.Shape = Enum.PartType.Block
+menuModel.Color = Color3.fromRGB(75, 0, 130) -- Tím đậm
+menuModel.Name = "Handle"
+menuModel.Anchored = false
+menuModel.CanCollide = false
+menuModel.Parent = menuItem
+
+-- Tạo mô hình cầm tay giống điện thoại
+local phoneModel = Instance.new("Part")
+phoneModel.Size = Vector3.new(0.5, 1.5, 0.2)
+phoneModel.Color = Color3.fromRGB(75, 0, 130)
+phoneModel.Shape = Enum.PartType.Cylinder
+phoneModel.Name = "Handle"
+phoneModel.Anchored = false
+phoneModel.CanCollide = false
+phoneModel.Parent = menuItem
+
+local phoneLabel = Instance.new("TextLabel", phoneModel)
+phoneLabel.Size = UDim2.new(1, 0, 0.1, 0)
+phoneLabel.Position = UDim2.new(0, 0, 0.9, 0)
+phoneLabel.Text = "HAPPY"
+phoneLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+phoneLabel.BackgroundTransparency = 1
+phoneLabel.Font = Enum.Font.SourceSansBold
+phoneLabel.TextScaled = true
+
+-- Hiện/ẩn menu khi cầm item Menu
+menuItem.Equipped:Connect(function()
+    menuFrame.Visible = true
 end)
 
-frame.InputChanged:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseMovement then
-		dragInput = input
-	end
+menuItem.Unequipped:Connect(function()
+    menuFrame.Visible = false
 end)
 
-game:GetService("UserInputService").InputChanged:Connect(function(input)
-	if input == dragInput and dragging then
-		update(input)
-	end
-end)
-
--- Xóa GUI khi bấm nút
-closeButton.MouseButton1Click:Connect(function()
-    gui:Destroy()
+-- Khi chết hoặc reset, trả lại item Menu
+player.CharacterAdded:Connect(function()
+    wait(1) -- Đợi 1 giây để đảm bảo nhân vật được tạo
+    menuItem.Parent = backpack
 end)
