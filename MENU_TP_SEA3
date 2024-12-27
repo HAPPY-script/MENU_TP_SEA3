@@ -26,7 +26,7 @@ local buttonsData = {
     {Name = "Tiki", Script = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/HAPPY-script/TICKEN_TIKI/refs/heads/main/TICKEN_TIKI"))() end},
     {Name = "On_tree", Script = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/HAPPY-script/TICKEN_ON_TREE/refs/heads/main/TICKEN_ON_TREE"))() end},
     {Name = "Candy", Script = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/HAPPY-script/TICKEN_CANDY/refs/heads/main/TICKEN_CANDY"))() end},
-    {Name = "Dojo", Script = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/HAPPY-script/TICKEN_DOJO/refs/heads/main/TICKEN_DOJO"))() end},
+    {Name = "Dojo", Script = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/HAPPY-script/TICKEN_DOJO/refs/heads/main/TICKEN_DOJO"))() end}
 }
 
 -- Kích thước và vị trí mặc định
